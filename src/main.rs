@@ -13,6 +13,7 @@ fn main() {
     let mut router = Router::new();
     router.get("/", get_form, "root");
     router.post("/gcd", post_gcd, "gcd");
+    router.get("/*", handle_404, "not_found");
     println!("Server on http://localhost:3000...");
     Iron::new(router).http("localhost:3000").unwrap();
 }
@@ -36,6 +37,14 @@ fn gcd(mut n: u64, mut m: u64) -> u64 {
         m = m % n;
     }
     n
+}
+
+fn handle_404(_: &mut Request) -> IronResult<Response> {
+    let mut res = Response::new();
+    res.set_mut(status::NotFound);
+    res.set_mut("text/html; charset=utf-8".parse::<Mime>().unwrap());
+    res.set_mut("<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1><p>The page you requested could not be found.</p><a href=\"/\">Go to the GCD calculator</a></body></html>");
+    Ok(res)
 }
 
 fn post_gcd(req: &mut Request) -> IronResult<Response> {
@@ -74,6 +83,7 @@ fn post_gcd(req: &mut Request) -> IronResult<Response> {
     }
     res.set_mut(status::Ok);
     res.set_mut("text/html; charset=utf-8".parse::<Mime>().unwrap());
-    res.set_mut(format!("The greatest common divisor of {:?} is {}\n", numbers, d));
+    res.set_mut(format!("The greatest common divisor of {:?} is {}\n
+    </br><a href=\"/\">Compute another GCD</a>\n", numbers, d));
     Ok(res)
 }
