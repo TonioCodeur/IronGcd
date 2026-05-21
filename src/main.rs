@@ -13,6 +13,7 @@ fn main() {
     let mut router = Router::new();
     router.get("/", get_form, "root");
     router.post("/gcd", post_gcd, "gcd");
+    router.get("/about", get_about, "about");
     router.get("/*", handle_404, "not_found");
     println!("Server on http://localhost:3000...");
     Iron::new(router).http("localhost:3000").unwrap();
@@ -37,6 +38,22 @@ fn gcd(mut n: u64, mut m: u64) -> u64 {
         m = m % n;
     }
     n
+}
+
+fn get_about(_: &mut Request) -> IronResult<Response> {
+    let mut res = Response::new();
+    res.set_mut(status::Ok);
+    res.set_mut("text/html; charset=utf-8".parse::<Mime>().unwrap());
+    res.set_mut("<html>
+    <head>
+    <title>About GCD Calculator</title>
+    </head>
+    <body>
+    <h1>About GCD Calculator</h1>
+    <p>This is a simple web application that computes the greatest common divisor of two numbers.</p>
+    </body>
+    </html>");
+    Ok(res)
 }
 
 fn handle_404(_: &mut Request) -> IronResult<Response> {
